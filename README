@@ -17,3 +17,7 @@ exit.
 
 In addition to the standard Qt arguments, v4l2ucp-qt4 will also recognize -h and
 --help. These will print a brief usage summary and exit.
+
+To build this software invoke:
+qmake
+make
