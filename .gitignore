@@ -1,0 +1,5 @@
+Makefile
+*.o
+moc_*
+v4l2ucp-qt4
+*.swp
