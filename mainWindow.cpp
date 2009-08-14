@@ -34,6 +34,7 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QMenu>
+#include <QTimer>
 
 #include "v4l2controls.h"
 #include "mainWindow.h"
@@ -48,25 +49,41 @@ MainWindow::MainWindow(QWidget *parent, const char *name) :
     menu->addAction("&Close", this, SLOT(close()), Qt::CTRL+Qt::Key_W);
     menu->addSeparator();
     menu->addAction("E&xit", qApp, SLOT(quit()), Qt::CTRL+Qt::Key_Q);
-    
     menu->setTitle("&File");
     menuBar()->addMenu(menu);
     
     menu = new QMenu(this);
-    //menu->setCheckable(false);
     resetAllId = menu->addAction("&All");
     resetMenu = menu;
-    
     menu->setTitle("&Reset");
     menuBar()->addMenu(menu);
 
     menu = new QMenu(this);
-    //menu->setCheckable(false);
+    updateActions[0] = menu->addAction("Disabled", this, SLOT(updateDisabled()));
+    menu->addSeparator();
+    updateActions[1] = menu->addAction("1 sec", this, SLOT(update1Sec()));
+    updateActions[2] = menu->addAction("5 sec", this, SLOT(update5Sec()));
+    updateActions[3] = menu->addAction("10 sec", this, SLOT(update10Sec()));
+    updateActions[4] = menu->addAction("20 sec", this, SLOT(update20Sec()));
+    updateActions[5] = menu->addAction("30 sec", this, SLOT(update30Sec()));
+    menu->addSeparator();
+    menu->addAction("Update now", this, SLOT(timerShot()));
+    menu->setTitle("&Update");
+    menuBar()->addMenu(menu);
+    for (int i = 0; i < 6; i++)
+    {
+        updateActions[i]->setCheckable(true);
+    }
+    updateActions[0]->setChecked(true);
+
+    menu = new QMenu(this);
     menu->addAction("&About", this, SLOT(about()));
     menu->addAction("About &Qt", this, SLOT(aboutQt()));
     menu->setTitle("&Help");
-
     menuBar()->addMenu(menu);
+
+    QObject::connect(&timer, SIGNAL(timeout()), this, SLOT(timerShot()) );
+
 }
 
 void MainWindow::fileOpen()
@@ -234,6 +251,10 @@ void MainWindow::add_control(struct v4l2_queryctrl &ctrl, int fd, QWidget *paren
         case V4L2_CTRL_TYPE_BUTTON:
             w = new V4L2ButtonControl(fd, ctrl, parent);
             break;
+        case V4L2_CTRL_TYPE_INTEGER64:
+        case V4L2_CTRL_TYPE_CTRL_CLASS:
+        default:
+            break;
     }
     
     if(!w) {
@@ -252,7 +273,7 @@ void MainWindow::add_control(struct v4l2_queryctrl &ctrl, int fd, QWidget *paren
     pb = new QPushButton("Update", parent);
     layout->addWidget(pb);
     QObject::connect( pb, SIGNAL(clicked()), w, SLOT(updateStatus()) );
-    //QObject::connect( this, SIGNAL(updateNow()), w, SLOT(updateStatus()) );
+    QObject::connect( this, SIGNAL(updateNow()), w, SLOT(updateStatus()) );
     
     if(ctrl.type == V4L2_CTRL_TYPE_BUTTON) {
         l = new QLabel(parent);
@@ -263,72 +284,6 @@ void MainWindow::add_control(struct v4l2_queryctrl &ctrl, int fd, QWidget *paren
         QObject::connect(pb, SIGNAL(clicked()), w, SLOT(resetToDefault()) );
         QObject::connect(resetAllId, SIGNAL(triggered(bool)), w, SLOT(resetToDefault()) );
     }
-}
-
-void MainWindow::timer1s()
-{
-    /*updateMenu->setItemChecked(id1s, TRUE);
-    updateMenu->setItemChecked(id5s, FALSE);
-    updateMenu->setItemChecked(id30s, FALSE);
-    updateMenu->setItemChecked(id1m, FALSE);
-    updateMenu->setItemChecked(id5m, FALSE);
-    updateMenu->setItemChecked(idNever, FALSE);
-    timer->changeInterval(1000);*/
-}
-
-void MainWindow::timer5s()
-{
-    /*updateMenu->setItemChecked(id1s, FALSE);
-    updateMenu->setItemChecked(id5s, TRUE);
-    updateMenu->setItemChecked(id30s, FALSE);
-    updateMenu->setItemChecked(id1m, FALSE);
-    updateMenu->setItemChecked(id5m, FALSE);
-    updateMenu->setItemChecked(idNever, FALSE);
-    timer->changeInterval(5000);*/
-}
-
-void MainWindow::timer30s()
-{
-    /*updateMenu->setItemChecked(id1s, FALSE);
-    updateMenu->setItemChecked(id5s, FALSE);
-    updateMenu->setItemChecked(id30s, TRUE);
-    updateMenu->setItemChecked(id1m, FALSE);
-    updateMenu->setItemChecked(id5m, FALSE);
-    updateMenu->setItemChecked(idNever, FALSE);
-    timer->changeInterval(30000);*/
-}
-
-void MainWindow::timer1m()
-{
-    /*updateMenu->setItemChecked(id1s, FALSE);
-    updateMenu->setItemChecked(id5s, FALSE);
-    updateMenu->setItemChecked(id30s, FALSE);
-    updateMenu->setItemChecked(id1m, TRUE);
-    updateMenu->setItemChecked(id5m, FALSE);
-    updateMenu->setItemChecked(idNever, FALSE);
-    timer->changeInterval(60000);*/
-}
-
-void MainWindow::timer5m()
-{
-    /*updateMenu->setItemChecked(id1s, FALSE);
-    updateMenu->setItemChecked(id5s, FALSE);
-    updateMenu->setItemChecked(id30s, FALSE);
-    updateMenu->setItemChecked(id1m, FALSE);
-    updateMenu->setItemChecked(id5m, TRUE);
-    updateMenu->setItemChecked(idNever, FALSE);
-    timer->changeInterval(300000);*/
-}
-
-void MainWindow::timerNever()
-{
-    /*updateMenu->setItemChecked(id1s, FALSE);
-    updateMenu->setItemChecked(id5s, FALSE);
-    updateMenu->setItemChecked(id30s, FALSE);
-    updateMenu->setItemChecked(id1m, FALSE);
-    updateMenu->setItemChecked(id5m, FALSE);
-    updateMenu->setItemChecked(idNever, TRUE);
-    timer->stop();*/
 }
 
 void MainWindow::about()
@@ -356,4 +311,80 @@ void MainWindow::about()
 void MainWindow::aboutQt()
 {
     QMessageBox::aboutQt(this);
+}
+
+void MainWindow::updateDisabled()
+{
+    for (int i = 0; i < 6; i++)
+    {
+        updateActions[i]->setChecked(false);
+    }
+    updateActions[0]->setChecked(true);
+    timer.stop();
+}
+
+void MainWindow::update1Sec()
+{
+    for (int i = 0; i < 6; i++)
+    {
+        updateActions[i]->setChecked(false);
+    }
+    updateActions[1]->setChecked(true);
+    timer.stop();
+    timer.setInterval(1000);
+    timer.start();
+}
+
+void MainWindow::update5Sec()
+{
+    for (int i = 0; i < 6; i++)
+    {
+        updateActions[i]->setChecked(false);
+    }
+    updateActions[2]->setChecked(true);
+    timer.stop();
+    timer.setInterval(5000);
+    timer.start();
+}
+
+void MainWindow::update10Sec()
+{
+    for (int i = 0; i < 6; i++)
+    {
+        updateActions[i]->setChecked(false);
+    }
+    updateActions[3]->setChecked(true);
+    timer.stop();
+    timer.setInterval(10000);
+    timer.start();
+}
+
+void MainWindow::update20Sec()
+{
+    for (int i = 0; i < 6; i++)
+    {
+        updateActions[i]->setChecked(false);
+    }
+    updateActions[4]->setChecked(true);
+    timer.stop();
+    timer.setInterval(20000);
+    timer.start();
+}
+
+void MainWindow::update30Sec()
+{
+    for (int i = 0; i < 6; i++)
+    {
+        updateActions[i]->setChecked(false);
+    }
+    updateActions[5]->setChecked(true);
+    timer.stop();
+    timer.setInterval(30000);
+    timer.start();
+}
+
+void MainWindow::timerShot()
+{
+    qDebug("Timer shot");
+    emit(updateNow());
 }

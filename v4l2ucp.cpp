@@ -1,5 +1,6 @@
 /*  v4l2ucp - A universal control panel for all V4L2 devices
     Copyright (C) 2005 Scott J. Bertin (scottbertin@yahoo.com)
+    Copyright (C) 2009 Vasily Khoruzhick (anarsoul@gmail.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,7 +21,7 @@
 #include <cstring>
 #include <iostream>
 
-#include <qapplication.h>
+#include <QApplication>
 
 #include "mainWindow.h"
 

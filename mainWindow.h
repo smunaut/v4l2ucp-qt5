@@ -28,15 +28,19 @@ class MainWindow : public QMainWindow
     
 public slots:
     void fileOpen();
-    void timer1s();
-    void timer5s();
-    void timer30s();
-    void timer1m();
-    void timer5m();
-    void timerNever();
+    void updateDisabled();
+    void update1Sec();
+    void update5Sec();
+    void update10Sec();
+    void update20Sec();
+    void update30Sec();
+    void timerShot();
     void about();
     void aboutQt();
-    
+   
+signals:
+    void updateNow();
+
 public:
     static MainWindow *openFile(const char *fileName);
     ~MainWindow();
@@ -45,6 +49,8 @@ private:
     QMenu *updateMenu, *resetMenu;
     int fd;
     QAction *resetAllId;
+    QAction *updateActions[6];
+    QTimer timer;
     
     MainWindow(QWidget *parent=0, const char *name=0);
     void add_control(struct v4l2_queryctrl &ctrl, int fd, QWidget *parent, QGridLayout *);
