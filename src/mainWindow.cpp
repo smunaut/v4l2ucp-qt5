@@ -288,8 +288,8 @@ void MainWindow::add_control(struct v4l2_queryctrl &ctrl, int fd, QWidget *paren
 
 void MainWindow::about()
 {
-    QMessageBox::about(this, "About", "v4l2ucp-qt4 Version "PACKAGE_VERSION"\n\n"
-        "v4l2ucp-qt4 is a port of an original v4l2ucp to Qt4 library,\n"
+    QMessageBox::about(this, "About", "v4l2ucp Version "V4L2UCP_VERSION"\n\n"
+        "This application is a port of an original v4l2ucp to Qt4 library,\n"
         "v4l2ucp is a universal control panel for all V4L2 devices. The\n"
         "controls come directly from the driver. If they cause problems\n"
         "with your hardware, please contact the maintainer of the driver.\n\n"

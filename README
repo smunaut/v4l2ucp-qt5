@@ -1,4 +1,4 @@
-v4l2ucp-qt4 - A universal control panel for all Video for Linux Two (V4L2) devices.
+v4l2ucp - A universal control panel for all Video for Linux Two (V4L2) devices.
 
 This is port of an original v4l2ucp to Qt4 library. Original version was written
 Scott J. Bertin.
@@ -15,9 +15,11 @@ is set, that file will be opened. Finally, it will try to open /dev/video0
 if nothing else was specified. If no devices can be opened, the program will
 exit.
 
-In addition to the standard Qt arguments, v4l2ucp-qt4 will also recognize -h and
+In addition to the standard Qt arguments, v4l2ucp will also recognize -h and
 --help. These will print a brief usage summary and exit.
 
 To build this software invoke:
-qmake
+mkdir build
+cd build
+cmake ..
 make
