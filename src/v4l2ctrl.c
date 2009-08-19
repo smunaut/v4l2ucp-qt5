@@ -64,7 +64,7 @@ int do_save(int fd, FILE *file)
                 continue;
             }
             if(ioctl(fd, VIDIOC_G_CTRL, &c) == 0) {
-                fprintf(file, FORMATW, i, ctrl.name, c.value);
+                fprintf(file, FORMATW, c.id, ctrl.name, c.value);
             }
 	} while(0 == ioctl (fd, VIDIOC_QUERYCTRL, &ctrl));
     } else
