@@ -38,7 +38,7 @@ void usage(const char *argv0)
     printf("       %s -h\n", argv0);
     printf("-s to save settings to filename\n");
     printf("-l to load settings from filename\n");
-    printf("-d to specify the device name to use. Defaults to /dev/video.\n");
+    printf("-d to specify the device name to use. Defaults to /dev/video0.\n");
     printf("-h to print this message.\n");
 }
 
@@ -172,7 +172,7 @@ int main(int argc, char **argv)
 {
     int i, fd, ret;
     int load = -1;
-    const char *device = "/dev/video";
+    const char *device = "/dev/video0";
     const char *filename, *mode;
     FILE *file;
     

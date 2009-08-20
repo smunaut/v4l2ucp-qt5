@@ -35,7 +35,7 @@ void usage(const char *argv0)
     cout << "filename is one or more device files for the ";
     cout << "V4L2 devices to control." << endl;
     cout << "If no filenames are given, the filename specified in the" << endl;
-    cout << "environment variable V4L2UCP_DEV, or /dev/video will be used.";
+    cout << "environment variable V4L2UCP_DEV, or /dev/video0 will be used.";
     cout << endl;
     cout << "Also accepts standard Qt arguments." << endl;
 }
