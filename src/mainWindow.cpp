@@ -385,6 +385,5 @@ void MainWindow::update30Sec()
 
 void MainWindow::timerShot()
 {
-    qDebug("Timer shot");
     emit(updateNow());
 }
