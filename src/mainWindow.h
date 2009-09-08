@@ -21,6 +21,7 @@
 #include <QTimer>
 #include <QMenu>
 #include <QGridLayout>
+#include <QProcess>
 
 class MainWindow : public QMainWindow
 {
@@ -37,6 +38,8 @@ public slots:
     void timerShot();
     void about();
     void aboutQt();
+    void startPreview();
+    void configurePreview();
    
 signals:
     void updateNow();
@@ -51,6 +54,7 @@ private:
     QAction *resetAllId;
     QAction *updateActions[6];
     QTimer timer;
+    QProcess *previewProcess;
     
     MainWindow(QWidget *parent=0, const char *name=0);
     void add_control(struct v4l2_queryctrl &ctrl, int fd, QWidget *parent, QGridLayout *);

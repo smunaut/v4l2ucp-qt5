@@ -41,7 +41,8 @@
 
 MainWindow::MainWindow(QWidget *parent, const char *name) :
     QMainWindow(parent),
-    fd(-1)
+    fd(-1),
+    previewProcess(NULL)
 {
     this->setWindowTitle(name);
     QMenu *menu = new QMenu(this);
@@ -75,6 +76,12 @@ MainWindow::MainWindow(QWidget *parent, const char *name) :
         updateActions[i]->setCheckable(true);
     }
     updateActions[0]->setChecked(true);
+
+    menu = new QMenu(this);
+    menu->addAction("Configure preview...", this, SLOT(configurePreview()));
+    menu->addAction("Start preview", this, SLOT(startPreview()));
+    menu->setTitle("Preview");
+    menuBar()->addMenu(menu);
 
     menu = new QMenu(this);
     menu->addAction("&About", this, SLOT(about()));
@@ -386,4 +393,32 @@ void MainWindow::update30Sec()
 void MainWindow::timerShot()
 {
     emit(updateNow());
+}
+
+void MainWindow::startPreview()
+{
+    if (previewProcess && previewProcess->state() != QProcess::NotRunning)
+    {
+        QMessageBox::warning(NULL, "v4l2ucp: warning", "Preview process is already started", "OK");
+        return;
+    }
+
+    if (!previewProcess)
+    {
+        previewProcess = new QProcess(this);
+    }
+
+    QStringList env = QProcess::systemEnvironment();
+    env << "LD_PRELOAD=/usr/lib/libv4l/v4l2convert.so";
+    previewProcess->setEnvironment(env);
+
+    QStringList args;
+    args << "tv://";
+
+    previewProcess->start("mplayer", args);
+}
+
+void MainWindow::configurePreview()
+{
+    QMessageBox::warning(NULL, "v4l2ucp: warning", "Not implemented!", "OK");
 }
