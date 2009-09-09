@@ -3,3 +3,4 @@ Makefile
 moc_*
 v4l2ucp-qt4
 *.swp
+build
