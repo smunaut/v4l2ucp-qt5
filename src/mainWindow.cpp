@@ -38,6 +38,7 @@
 
 #include "v4l2controls.h"
 #include "mainWindow.h"
+#include "previewSettings.h"
 
 MainWindow::MainWindow(QWidget *parent, const char *name) :
     QMainWindow(parent),
@@ -420,5 +421,8 @@ void MainWindow::startPreview()
 
 void MainWindow::configurePreview()
 {
-    QMessageBox::warning(NULL, "v4l2ucp: warning", "Not implemented!", "OK");
+    PreviewSettingsDialog dialog;
+    int res = dialog.exec();
+
+    qDebug("res is %d", res);
 }
