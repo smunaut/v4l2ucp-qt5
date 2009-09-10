@@ -20,7 +20,6 @@
 
 #include <fcntl.h>
 #include <sys/ioctl.h>
-#include <time.h>
 #include <cerrno>
 #include <cstring>
 
