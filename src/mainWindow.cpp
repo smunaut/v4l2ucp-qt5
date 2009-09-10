@@ -18,8 +18,6 @@
 
  */
 
-#define PACKAGE_VERSION "2.0"
-
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <time.h>
