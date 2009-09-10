@@ -18,14 +18,32 @@
  */
 
 #include "previewSettings.h"
+#include <QSettings>
+
 
 PreviewSettingsDialog::PreviewSettingsDialog(QWidget *parent)
     : QDialog(parent)
 {
-    ui.setupUi(this);    
+    ui.setupUi(this);
+    QSettings settings(APP_ORG, APP_NAME);
+    if (settings.contains(SETTINGS_APP_BINARY_NAME))
+    {
+        ui.appNameEdit->setText(settings.value(SETTINGS_APP_BINARY_NAME).toString());
+    }
+    else
+    {
+        ui.appNameEdit->setText("mplayer");
+    }
 }
 
 PreviewSettingsDialog::~PreviewSettingsDialog()
 {
 
+}
+
+void PreviewSettingsDialog::saveSettings()
+{
+    QSettings settings(APP_ORG, APP_NAME);
+    settings.setValue(SETTINGS_APP_BINARY_NAME, ui.appNameEdit->text());
+    settings.sync();
 }

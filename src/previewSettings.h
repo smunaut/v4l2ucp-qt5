@@ -20,6 +20,10 @@
 #include <QDialog>
 #include "ui_previewSettings.h"
 
+#define APP_ORG "v4l2ucp"
+#define APP_NAME "v4l2ucp"
+#define SETTINGS_APP_BINARY_NAME "preview/app_binary_name"
+
 class PreviewSettingsDialog : public QDialog
 {
     Q_OBJECT
@@ -28,6 +32,7 @@ class PreviewSettingsDialog : public QDialog
 
         PreviewSettingsDialog(QWidget *parent = NULL);
         ~PreviewSettingsDialog();
+        void saveSettings();
 
     protected:
         Ui::previewSettingsDialog ui;

@@ -40,6 +40,8 @@ public slots:
     void aboutQt();
     void startPreview();
     void configurePreview();
+    void previewProcError(QProcess::ProcessError er);
+    void previewFinished(int exitCode, QProcess::ExitStatus status);
    
 signals:
     void updateNow();

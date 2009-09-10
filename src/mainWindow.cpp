@@ -22,6 +22,7 @@
 
 #include <fcntl.h>
 #include <sys/ioctl.h>
+#include <time.h>
 #include <cerrno>
 #include <cstring>
 
@@ -35,6 +36,7 @@
 #include <QMessageBox>
 #include <QMenu>
 #include <QTimer>
+#include <QSettings>
 
 #include "v4l2controls.h"
 #include "mainWindow.h"
@@ -407,6 +409,17 @@ void MainWindow::startPreview()
     if (!previewProcess)
     {
         previewProcess = new QProcess(this);
+        QObject::connect(previewProcess, SIGNAL(error(QProcess::ProcessError)),
+                        this, SLOT(previewProcError(QProcess::ProcessError)));
+        QObject::connect(previewProcess, SIGNAL(finished(int, QProcess::ExitStatus)),
+                        this, SLOT(previewFinished(int, QProcess::ExitStatus)));
+    }
+
+    QString appBinaryName = "mplayer";
+    QSettings settings(APP_ORG, APP_NAME);
+    if (settings.contains(SETTINGS_APP_BINARY_NAME))
+    {
+        appBinaryName = settings.value(SETTINGS_APP_BINARY_NAME).toString();
     }
 
     QStringList env = QProcess::systemEnvironment();
@@ -416,13 +429,43 @@ void MainWindow::startPreview()
     QStringList args;
     args << "tv://";
 
-    previewProcess->start("mplayer", args);
+    previewProcess->start(appBinaryName, args);
 }
 
 void MainWindow::configurePreview()
 {
     PreviewSettingsDialog dialog;
     int res = dialog.exec();
+    if (res == QDialog::Accepted)
+    {
+        dialog.saveSettings();
+    }
+}
 
-    qDebug("res is %d", res);
+void MainWindow::previewProcError(QProcess::ProcessError er)
+{
+    switch (er)
+    {
+        case QProcess::FailedToStart:
+            QMessageBox::critical(NULL, "v4l2ucp", "Failed to start preview process!", "OK");
+            break;
+        case QProcess::Crashed:
+            QMessageBox::critical(NULL, "v4l2ucp", "Preview process crashed!", "OK");
+            break;
+        default:
+            break;
+    }
+}
+
+void MainWindow::previewFinished(int exitCode, QProcess::ExitStatus status)
+{
+    switch (status)
+    {
+        case QProcess::CrashExit:
+            break;
+        case QProcess::NormalExit:
+            break;
+        default:
+            break;
+    }
 }
