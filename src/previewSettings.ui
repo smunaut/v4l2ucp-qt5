@@ -42,7 +42,11 @@
           </widget>
          </item>
          <item>
-          <widget class="QListWidget" name="envList"/>
+          <widget class="QListWidget" name="envList">
+           <property name="toolTip">
+            <string>Double click on item to edit it.</string>
+           </property>
+          </widget>
          </item>
          <item>
           <widget class="QLineEdit" name="envEdit"/>
@@ -53,13 +57,6 @@
             <widget class="QPushButton" name="addEnvBut">
              <property name="text">
               <string>Add value</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="updateEnvBut">
-             <property name="text">
-              <string>Update value</string>
              </property>
             </widget>
            </item>
@@ -84,7 +81,11 @@
           </widget>
          </item>
          <item>
-          <widget class="QListWidget" name="argList"/>
+          <widget class="QListWidget" name="argList">
+           <property name="toolTip">
+            <string>Double click on item to edit it.</string>
+           </property>
+          </widget>
          </item>
          <item>
           <widget class="QLineEdit" name="argEdit"/>
@@ -95,13 +96,6 @@
             <widget class="QPushButton" name="addArgBut">
              <property name="text">
               <string>Add value</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="updateArgBut">
-             <property name="text">
-              <string>Update value</string>
              </property>
             </widget>
            </item>

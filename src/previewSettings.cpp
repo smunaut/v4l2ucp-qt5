@@ -18,6 +18,7 @@
  */
 
 #include "previewSettings.h"
+#include <QMessageBox>
 #include <QSettings>
 
 
@@ -25,6 +26,23 @@ PreviewSettingsDialog::PreviewSettingsDialog(QWidget *parent)
     : QDialog(parent)
 {
     ui.setupUi(this);
+    QObject::connect(ui.envList, SIGNAL(itemDoubleClicked(QListWidgetItem *)),
+        this, SLOT(envItemDoubleClicked(QListWidgetItem *)));
+    QObject::connect(ui.envList, SIGNAL(currentItemChanged(QListWidgetItem *, QListWidgetItem *)),
+        this, SLOT(listCurItemChanged(QListWidgetItem *, QListWidgetItem *)));
+    QObject::connect(ui.argList, SIGNAL(itemDoubleClicked(QListWidgetItem *)),
+        this, SLOT(argItemDoubleClicked(QListWidgetItem *)));
+    QObject::connect(ui.argList, SIGNAL(currentItemChanged(QListWidgetItem *, QListWidgetItem *)),
+        this, SLOT(listCurItemChanged(QListWidgetItem *, QListWidgetItem *)));
+    QObject::connect(ui.addEnvBut, SIGNAL(clicked()),
+        this, SLOT(addEnvItemClicked()));
+    QObject::connect(ui.addArgBut, SIGNAL(clicked()),
+        this, SLOT(addArgItemClicked()));
+    QObject::connect(ui.removeEnvBut, SIGNAL(clicked()),
+        this, SLOT(delEnvItemClicked()));
+    QObject::connect(ui.removeArgBut, SIGNAL(clicked()),
+        this, SLOT(delArgItemClicked()));
+
     QSettings settings(APP_ORG, APP_NAME);
     if (settings.contains(SETTINGS_APP_BINARY_NAME))
     {
@@ -46,4 +64,73 @@ void PreviewSettingsDialog::saveSettings()
     QSettings settings(APP_ORG, APP_NAME);
     settings.setValue(SETTINGS_APP_BINARY_NAME, ui.appNameEdit->text());
     settings.sync();
+}
+
+void PreviewSettingsDialog::envItemDoubleClicked(QListWidgetItem *item)
+{
+    ui.envList->openPersistentEditor(item);
+}
+
+void PreviewSettingsDialog::argItemDoubleClicked(QListWidgetItem *item)
+{
+    ui.argList->openPersistentEditor(item);
+}
+
+void PreviewSettingsDialog::addEnvItemClicked()
+{
+    if (!ui.envEdit->text().isEmpty())
+    {
+        QListWidgetItem *item = NULL;
+        item = new QListWidgetItem(ui.envEdit->text(), ui.envList);
+        ui.envEdit->clear();
+    }
+    else
+    {
+        QMessageBox::warning(NULL, "v4l2ucp", "Empty values seems to be meaningless!", "OK");
+    }
+}
+
+void PreviewSettingsDialog::addArgItemClicked()
+{
+    if (!ui.argEdit->text().isEmpty())
+    {
+        QListWidgetItem *item = NULL;
+        item = new QListWidgetItem(ui.argEdit->text(), ui.argList);
+        ui.argEdit->clear();
+    }
+    else
+    {
+        QMessageBox::warning(NULL, "v4l2ucp", "Empty values seems to be meaningless!", "OK");
+    }
+}
+void PreviewSettingsDialog::listCurItemChanged(QListWidgetItem *newItem, QListWidgetItem *oldItem)
+{
+    if (oldItem)
+    {
+        oldItem->listWidget()->closePersistentEditor(oldItem);
+    }
+}
+
+void PreviewSettingsDialog::delEnvItemClicked()
+{
+    if (ui.envList->currentItem())
+    {
+        delete ui.envList->currentItem();
+    }
+    else
+    {
+        QMessageBox::warning(NULL, "v4l2ucp", "Select entry to delete.", "OK");
+    }
+}
+
+void PreviewSettingsDialog::delArgItemClicked()
+{
+    if (ui.argList->currentItem())
+    {
+        delete ui.argList->currentItem();
+    }
+    else
+    {
+        QMessageBox::warning(NULL, "v4l2ucp", "Select entry to delete.", "OK");
+    }
 }

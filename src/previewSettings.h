@@ -24,9 +24,21 @@
 #define APP_NAME "v4l2ucp"
 #define SETTINGS_APP_BINARY_NAME "preview/app_binary_name"
 
+class QListWidgetItem;
+
 class PreviewSettingsDialog : public QDialog
 {
     Q_OBJECT
+
+    public slots:
+        void envItemDoubleClicked(QListWidgetItem *item);
+        void argItemDoubleClicked(QListWidgetItem *item);
+        void listCurItemChanged(QListWidgetItem *newItem, QListWidgetItem *oldItem);
+
+        void addEnvItemClicked();
+        void addArgItemClicked();
+        void delEnvItemClicked();
+        void delArgItemClicked();
 
     public:
 
