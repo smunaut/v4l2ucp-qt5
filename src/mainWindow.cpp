@@ -35,8 +35,6 @@
 #include <QTimer>
 #include <QSettings>
 
-#include <QtDebug>
-
 #include "v4l2controls.h"
 #include "mainWindow.h"
 #include "previewSettings.h"
