@@ -49,6 +49,8 @@ void PreviewSettingsDialog::connectSignals()
         this, SLOT(delEnvItemClicked()));
     QObject::connect(ui.removeArgBut, SIGNAL(clicked()),
         this, SLOT(delArgItemClicked()));
+    QObject::connect(ui.defaultsBut, SIGNAL(clicked()),
+        this, SLOT(defaultsClicked()));
 }
 
 void PreviewSettingsDialog::loadSettings()
@@ -201,4 +203,18 @@ void PreviewSettingsDialog::delArgItemClicked()
     {
         QMessageBox::warning(NULL, "v4l2ucp", "Select entry to delete.", "OK");
     }
+}
+
+void PreviewSettingsDialog::defaultsClicked()
+{
+    QListWidgetItem *item;
+
+    ui.argList->clear();
+    ui.envList->clear();
+    ui.argEdit->clear();
+    ui.envEdit->clear();
+    ui.appNameEdit->setText("mplayer");
+
+    item = new QListWidgetItem("LD_PRELOAD=/usr/lib/libv4l/v4l2convert.so", ui.envList);
+    item = new QListWidgetItem("tv://", ui.argList);
 }

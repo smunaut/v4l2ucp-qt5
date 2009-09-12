@@ -41,6 +41,7 @@ class PreviewSettingsDialog : public QDialog
         void addArgItemClicked();
         void delEnvItemClicked();
         void delArgItemClicked();
+        void defaultsClicked();
 
     public:
 
