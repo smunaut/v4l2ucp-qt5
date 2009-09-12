@@ -23,6 +23,8 @@
 #define APP_ORG "v4l2ucp"
 #define APP_NAME "v4l2ucp"
 #define SETTINGS_APP_BINARY_NAME "preview/app_binary_name"
+#define SETTINGS_ENV_LIST "preview/env_list"
+#define SETTINGS_ARG_LIST "preview/arg_list"
 
 class QListWidgetItem;
 
@@ -48,4 +50,8 @@ class PreviewSettingsDialog : public QDialog
 
     protected:
         Ui::previewSettingsDialog ui;
+
+    private:
+        void loadSettings();
+        void connectSignals();
 };

@@ -35,6 +35,8 @@
 #include <QTimer>
 #include <QSettings>
 
+#include <QtDebug>
+
 #include "v4l2controls.h"
 #include "mainWindow.h"
 #include "previewSettings.h"
@@ -420,12 +422,47 @@ void MainWindow::startPreview()
     }
 
     QStringList env = QProcess::systemEnvironment();
-    env << "LD_PRELOAD=/usr/lib/libv4l/v4l2convert.so";
-    previewProcess->setEnvironment(env);
+    if (settings.contains(SETTINGS_ENV_LIST))
+    {
+        QList<QVariant> envList = settings.value(SETTINGS_ENV_LIST).toList();
+        QList<QVariant>::iterator begin, end;
+        for (begin = envList.begin(),
+            end = envList.end(); begin != end; begin++)
+        {
+            env << (*begin).toString();
+        }
+    }
+    else
+    {
+        env << "LD_PRELOAD=/usr/lib/libv4l/v4l2convert.so";
+    }
 
     QStringList args;
-    args << "tv://";
+    if (settings.contains(SETTINGS_ARG_LIST))
+    {
+        QList<QVariant> argList = settings.value(SETTINGS_ARG_LIST).toList();
+        QList<QVariant>::iterator begin, end;
+        for (begin = argList.begin(),
+            end = argList.end(); begin != end; begin++)
+        {
+            QString arg = (*begin).toString();
+            if (arg.contains(' '))
+            {
+                QStringList splittedArg = arg.split(' ');
+                args << splittedArg;
+            }
+            else
+            {
+                args << arg;
+            }
+        }
+    }
+    else
+    {
+        args << "tv://";
+    }
 
+    previewProcess->setEnvironment(env);
     previewProcess->start(appBinaryName, args);
 }
 
@@ -461,6 +498,10 @@ void MainWindow::previewFinished(int exitCode, QProcess::ExitStatus status)
         case QProcess::CrashExit:
             break;
         case QProcess::NormalExit:
+            if (exitCode != 0)
+            {
+                QMessageBox::critical(NULL, "v4l2ucp", "Preview process exited with code != 0", "OK");
+            }
             break;
         default:
             break;

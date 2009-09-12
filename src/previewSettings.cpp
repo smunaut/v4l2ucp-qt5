@@ -26,6 +26,13 @@ PreviewSettingsDialog::PreviewSettingsDialog(QWidget *parent)
     : QDialog(parent)
 {
     ui.setupUi(this);
+
+    connectSignals();
+    loadSettings();
+}
+
+void PreviewSettingsDialog::connectSignals()
+{
     QObject::connect(ui.envList, SIGNAL(itemDoubleClicked(QListWidgetItem *)),
         this, SLOT(envItemDoubleClicked(QListWidgetItem *)));
     QObject::connect(ui.envList, SIGNAL(currentItemChanged(QListWidgetItem *, QListWidgetItem *)),
@@ -42,8 +49,12 @@ PreviewSettingsDialog::PreviewSettingsDialog(QWidget *parent)
         this, SLOT(delEnvItemClicked()));
     QObject::connect(ui.removeArgBut, SIGNAL(clicked()),
         this, SLOT(delArgItemClicked()));
+}
 
+void PreviewSettingsDialog::loadSettings()
+{
     QSettings settings(APP_ORG, APP_NAME);
+
     if (settings.contains(SETTINGS_APP_BINARY_NAME))
     {
         ui.appNameEdit->setText(settings.value(SETTINGS_APP_BINARY_NAME).toString());
@@ -52,17 +63,74 @@ PreviewSettingsDialog::PreviewSettingsDialog(QWidget *parent)
     {
         ui.appNameEdit->setText("mplayer");
     }
+
+    if (settings.contains(SETTINGS_ENV_LIST))
+    {
+        QList<QVariant> envList = settings.value(SETTINGS_ENV_LIST).toList();
+        QList<QVariant>::iterator begin, end;
+        for (begin = envList.begin(),
+            end = envList.end(); begin != end; begin++)
+        {
+            QListWidgetItem *item;
+            item = new QListWidgetItem((*begin).toString(), ui.envList);
+        }
+    }
+    else
+    {
+        QListWidgetItem *item;
+        item = new QListWidgetItem("LD_PRELOAD=/usr/lib/libv4l/v4l2convert.so", ui.envList);
+    }
+
+    if (settings.contains(SETTINGS_ARG_LIST))
+    {
+        QList<QVariant> argList = settings.value(SETTINGS_ARG_LIST).toList();
+        QList<QVariant>::iterator begin, end;
+        for (begin = argList.begin(),
+            end = argList.end(); begin != end; begin++)
+        {
+            QListWidgetItem *item;
+            item = new QListWidgetItem((*begin).toString(), ui.argList);
+        }
+    }
+    else
+    {
+        QListWidgetItem *item;
+        item = new QListWidgetItem("tv://", ui.argList);
+    }
 }
 
 PreviewSettingsDialog::~PreviewSettingsDialog()
 {
-
 }
 
 void PreviewSettingsDialog::saveSettings()
 {
     QSettings settings(APP_ORG, APP_NAME);
+
     settings.setValue(SETTINGS_APP_BINARY_NAME, ui.appNameEdit->text());
+    QList<QVariant> varList;
+    QList<QVariant>::iterator begin, end;
+    QListWidgetItem *item;
+    for (int i = 0; i < ui.envList->count(); i++)
+    {
+        item = ui.envList->item(i);
+        if (item)
+        {
+            varList << QVariant(item->text());
+        }
+    }
+    settings.setValue(SETTINGS_ENV_LIST, varList);
+    varList.clear();
+    for (int i = 0; i < ui.argList->count(); i++)
+    {
+        item = ui.argList->item(i);
+        if (item)
+        {
+            varList << QVariant(item->text());
+        }
+    }
+    settings.setValue(SETTINGS_ARG_LIST, varList);
+
     settings.sync();
 }
 
