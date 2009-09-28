@@ -128,8 +128,6 @@ V4L2IntegerControl::V4L2IntegerControl
                       this, SLOT(SetValueFromSlider()) );
     QObject::connect( le, SIGNAL(returnPressed()),
                       this, SLOT(SetValueFromText()) );
-    QObject::connect( le, SIGNAL(lostFocus()),
-                      this, SLOT(SetValueFromText()) );
     updateStatus();
 }
 
@@ -150,7 +148,11 @@ void V4L2IntegerControl::setValue(int val)
     QString str;
     str.setNum(val);
     le->setText(str);
+
+	/* FIXME: find clean solution to prevent infinite loop */
+	sl->blockSignals(true);
     sl->setValue(val);
+	sl->blockSignals(false);
 }
 
 int V4L2IntegerControl::getValue()
