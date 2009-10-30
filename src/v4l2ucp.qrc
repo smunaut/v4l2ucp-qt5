@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/" >
+        <file alias="v4l2ucp.png">../v4l2ucp.png</file>
+    </qresource>
+</RCC>

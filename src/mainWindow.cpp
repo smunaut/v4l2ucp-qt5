@@ -44,7 +44,8 @@ MainWindow::MainWindow(QWidget *parent, const char *name) :
     fd(-1),
     previewProcess(NULL)
 {
-    this->setWindowTitle(name);
+    setWindowTitle(name);
+	setWindowIcon(QIcon(":/v4l2ucp.png"));
     QMenu *menu = new QMenu(this);
     menu->addAction("&Open", this, SLOT(fileOpen()), Qt::CTRL+Qt::Key_O);
     menu->addAction("&Close", this, SLOT(close()), Qt::CTRL+Qt::Key_W);
