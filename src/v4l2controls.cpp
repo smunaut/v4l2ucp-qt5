@@ -105,21 +105,10 @@ V4L2IntegerControl::V4L2IntegerControl
     sl->setVisible(true);
     this->layout.addWidget(sl);
 
-    QString maxStr, minStr, defStr, inputMask;
-    maxStr.setNum(maximum);
-    minStr.setNum(minimum);
+    QString defStr;
     defStr.setNum(default_value);
-    int maxlen = maxStr.length() > minStr.length() ?
-        maxStr.length() : minStr.length();
-    inputMask.fill('0',maxlen);
-    if(minimum < 0)
-        inputMask.replace(0,1,'#');
-    if(maximum < 0)
-        inputMask.replace(0,1,'-');
     le = new QLineEdit(this);
     le->setText(defStr);
-    le->setInputMask(inputMask);
-    le->setMaxLength(maxlen);
     le->setValidator(new QIntValidator(minimum, maximum, this));
     this->layout.addWidget(le);
     
