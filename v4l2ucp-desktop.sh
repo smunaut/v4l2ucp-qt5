@@ -1,12 +1,10 @@
 #!/bin/sh
 cat <<EOF
 [Desktop Entry]
-Version=1.0
 Type=Application
-Name=v4l2ucp
-GenericName=V4L2 control panel
+Name=Video4Linux Control Panel
 Comment=A universal control panel for V4L2 devices
-Exec=$1/bin/v4l2ucp
-Categiroies=Application;Video;
-Icon=$1/share/icons/v4l2ucp.png
+Exec=v4l2ucp
+Categories=AudioVideo;X-AudioVideoTools;
+Icon=v4l2ucp
 EOF
