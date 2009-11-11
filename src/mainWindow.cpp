@@ -22,6 +22,7 @@
 #include <sys/ioctl.h>
 #include <cerrno>
 #include <cstring>
+#include <libv4l2.h>
 
 #include <QScrollArea>
 #include <QFileDialog>
@@ -114,7 +115,7 @@ void MainWindow::fileOpen()
 
 MainWindow *MainWindow::openFile(const char *fileName)
 {
-    int fd = open(fileName, O_RDWR, 0);
+    int fd = v4l2_open(fileName, O_RDWR, 0);
     if(fd < 0) {
         QString msg;
 	msg.sprintf("Unable to open file %s\n%s", fileName, strerror(errno));
@@ -123,7 +124,7 @@ MainWindow *MainWindow::openFile(const char *fileName)
     }
     
     struct v4l2_capability cap;
-    if(ioctl(fd, VIDIOC_QUERYCAP, &cap) == -1) {
+    if(v4l2_ioctl(fd, VIDIOC_QUERYCAP, &cap) == -1) {
         QString msg;
 	msg.sprintf("%s is not a V4L2 device", fileName);
 	QMessageBox::warning(NULL, "v4l2ucp: Not a V4L2 device", msg, "OK");
@@ -197,11 +198,11 @@ MainWindow *MainWindow::openFile(const char *fileName)
 #ifdef V4L2_CTRL_FLAG_NEXT_CTRL
     /* Try the extended control API first */
     ctrl.id = V4L2_CTRL_FLAG_NEXT_CTRL;
-    if(0 == ioctl (fd, VIDIOC_QUERYCTRL, &ctrl)) {
+    if(0 == v4l2_ioctl (fd, VIDIOC_QUERYCTRL, &ctrl)) {
 	do {
 		mw->add_control(ctrl, fd, grid, gridLayout);
 		ctrl.id |= V4L2_CTRL_FLAG_NEXT_CTRL;
-	} while(0 == ioctl (fd, VIDIOC_QUERYCTRL, &ctrl));
+	} while(0 == v4l2_ioctl (fd, VIDIOC_QUERYCTRL, &ctrl));
     } else
 #endif
     {
@@ -209,7 +210,7 @@ MainWindow *MainWindow::openFile(const char *fileName)
 	/* Check all the standard controls */
 	for(int i=V4L2_CID_BASE; i<V4L2_CID_LASTP1; i++) {
             ctrl.id = i;
-            if(ioctl(fd, VIDIOC_QUERYCTRL, &ctrl) == 0) {
+            if(v4l2_ioctl(fd, VIDIOC_QUERYCTRL, &ctrl) == 0) {
         	mw->add_control(ctrl, fd, grid, gridLayout);
             }
 	}
@@ -217,7 +218,7 @@ MainWindow *MainWindow::openFile(const char *fileName)
 	/* Check any custom controls */
 	for(int i=V4L2_CID_PRIVATE_BASE; ; i++) {
             ctrl.id = i;
-            if(ioctl(fd, VIDIOC_QUERYCTRL, &ctrl) == 0) {
+            if(v4l2_ioctl(fd, VIDIOC_QUERYCTRL, &ctrl) == 0) {
         	mw->add_control(ctrl, fd, grid, gridLayout);
             } else {
         	break;
@@ -233,7 +234,7 @@ MainWindow *MainWindow::openFile(const char *fileName)
 MainWindow::~MainWindow()
 {
     if(fd >= 0)
-        ::close(fd);
+        v4l2_close(fd);
 }
 
 void MainWindow::add_control(struct v4l2_queryctrl &ctrl, int fd, QWidget *parent, QGridLayout *layout)

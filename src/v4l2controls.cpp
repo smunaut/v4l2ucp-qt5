@@ -20,6 +20,7 @@
 #include <sys/ioctl.h>
 #include <cerrno>
 #include <cstring>
+#include <libv4l2.h>
 
 #include <QPushButton>
 #include <QLabel>
@@ -43,7 +44,7 @@ void V4L2Control::updateHardware()
     struct v4l2_control c;
     c.id = cid;
     c.value = getValue();
-    if(ioctl(fd, VIDIOC_S_CTRL, &c) == -1) {
+    if(v4l2_ioctl(fd, VIDIOC_S_CTRL, &c) == -1) {
         QString msg;
 	msg.sprintf("Unable to set %s\n%s", name, strerror(errno));
 	QMessageBox::warning(this, "Unable to set control", msg, "OK");
@@ -55,7 +56,7 @@ void V4L2Control::updateStatus()
 {
     struct v4l2_control c;
     c.id = cid;
-    if(ioctl(fd, VIDIOC_G_CTRL, &c) == -1) {
+    if(v4l2_ioctl(fd, VIDIOC_G_CTRL, &c) == -1) {
         QString msg;
 	msg.sprintf("Unable to get %s\n%s", name,
 	            strerror(errno));
@@ -66,7 +67,7 @@ void V4L2Control::updateStatus()
     }
     struct v4l2_queryctrl ctrl;
     ctrl.id = cid;
-    if(ioctl(fd, VIDIOC_QUERYCTRL, &ctrl) == -1) {
+    if(v4l2_ioctl(fd, VIDIOC_QUERYCTRL, &ctrl) == -1) {
         QString msg;
 	msg.sprintf("Unable to get the status of %s\n%s", name,
 	            strerror(errno));
@@ -213,7 +214,7 @@ V4L2MenuControl::V4L2MenuControl
         struct v4l2_querymenu qm;
         qm.id = ctrl.id;
         qm.index = i;
-        if(ioctl(fd, VIDIOC_QUERYMENU, &qm) == 0) {
+        if(v4l2_ioctl(fd, VIDIOC_QUERYMENU, &qm) == 0) {
             cb->insertItem(i, (const char *)qm.name);
         } else {
             QString msg;
@@ -261,7 +262,7 @@ void V4L2ButtonControl::updateStatus()
 {
     struct v4l2_queryctrl ctrl;
     ctrl.id = cid;
-    if(ioctl(fd, VIDIOC_QUERYCTRL, &ctrl) == -1) {
+    if(v4l2_ioctl(fd, VIDIOC_QUERYCTRL, &ctrl) == -1) {
         QString msg;
 	msg.sprintf("Unable to get the status of %s\n%s", name,
 	            strerror(errno));

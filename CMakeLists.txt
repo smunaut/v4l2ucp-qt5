@@ -6,6 +6,14 @@ set(V4L2UCP_VERSION 2.0.1)
 add_definitions(-Wall -DV4L2UCP_VERSION="${V4L2UCP_VERSION}")
 find_package(Qt4 REQUIRED)
 include( ${QT_USE_FILE} )
+find_library(V4L2_LIBRARY v4l2)
+
+MESSAGE(STATUS "Looking for libv4l")
+if (V4L2_LIBRARY)
+    MESSAGE(STATUS "Looking for libv4l - found")
+else (V4L2_LIBRARY)
+    MESSAGE(FATAL_ERROR "Looking for libv4l - not found.")
+endif (V4L2_LIBRARY)
 
 add_subdirectory(src)
 

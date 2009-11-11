@@ -27,6 +27,7 @@
 #include <sys/types.h>
 #include <linux/types.h>
 #include <linux/videodev.h>
+#include <libv4l2.h>
 
 #define FORMATW "%u:%31s:%d\n"
 #define FORMATR "%u:%31c:%d\n"
@@ -51,7 +52,7 @@ int do_save(int fd, FILE *file)
 #ifdef V4L2_CTRL_FLAG_NEXT_CTRL
     /* Try the extended control API first */
     ctrl.id = V4L2_CTRL_FLAG_NEXT_CTRL;
-    if(0 == ioctl (fd, VIDIOC_QUERYCTRL, &ctrl)) {
+    if(0 == v4l2_ioctl (fd, VIDIOC_QUERYCTRL, &ctrl)) {
 	do {
 	    c.id = ctrl.id;
             ctrl.id |= V4L2_CTRL_FLAG_NEXT_CTRL;
@@ -63,17 +64,17 @@ int do_save(int fd, FILE *file)
                ctrl.type != V4L2_CTRL_TYPE_MENU) {
                 continue;
             }
-            if(ioctl(fd, VIDIOC_G_CTRL, &c) == 0) {
+            if(v4l2_ioctl(fd, VIDIOC_G_CTRL, &c) == 0) {
                 fprintf(file, FORMATW, c.id, ctrl.name, c.value);
             }
-	} while(0 == ioctl (fd, VIDIOC_QUERYCTRL, &ctrl));
+	} while(0 == v4l2_ioctl (fd, VIDIOC_QUERYCTRL, &ctrl));
     } else
 #endif
     {
         /* Check all the standard controls */
         for(i=V4L2_CID_BASE; i<V4L2_CID_LASTP1; i++) {
             ctrl.id = i;
-            if(ioctl(fd, VIDIOC_QUERYCTRL, &ctrl) == 0) {
+            if(v4l2_ioctl(fd, VIDIOC_QUERYCTRL, &ctrl) == 0) {
                 if(ctrl.flags & V4L2_CTRL_FLAG_DISABLED) {
                     continue;
                 }
@@ -83,7 +84,7 @@ int do_save(int fd, FILE *file)
                     continue;
                 }
                 c.id = i;
-                if(ioctl(fd, VIDIOC_G_CTRL, &c) == 0) {
+                if(v4l2_ioctl(fd, VIDIOC_G_CTRL, &c) == 0) {
                     fprintf(file, FORMATW, i, ctrl.name, c.value);
                 }
             }
@@ -92,7 +93,7 @@ int do_save(int fd, FILE *file)
         /* Check any custom controls */
         for(i=V4L2_CID_PRIVATE_BASE; ; i++) {
             ctrl.id = i;
-            if(ioctl(fd, VIDIOC_QUERYCTRL, &ctrl) == 0) {
+            if(v4l2_ioctl(fd, VIDIOC_QUERYCTRL, &ctrl) == 0) {
                 if(ctrl.flags & V4L2_CTRL_FLAG_DISABLED) {
                     continue;
                 }
@@ -102,7 +103,7 @@ int do_save(int fd, FILE *file)
                     continue;
                 }
                 c.id = i;
-                if(ioctl(fd, VIDIOC_G_CTRL, &c) == 0) {
+                if(v4l2_ioctl(fd, VIDIOC_G_CTRL, &c) == 0) {
                     fprintf(file, FORMATW, i, ctrl.name, c.value);
                 }
             } else {
@@ -129,7 +130,7 @@ int do_load(int fd, FILE *file)
             n++;
         }
         ctrl.id = id;
-        if(ioctl(fd, VIDIOC_QUERYCTRL, &ctrl) == 0) {
+        if(v4l2_ioctl(fd, VIDIOC_QUERYCTRL, &ctrl) == 0) {
             if(strcmp((char *)ctrl.name, n)) {
                 fprintf(stderr, "Control name mismatch\n");
                 return EXIT_FAILURE;
@@ -148,7 +149,7 @@ int do_load(int fd, FILE *file)
             
             c.id = id;
             c.value = value;
-            if(ioctl(fd, VIDIOC_S_CTRL, &c) != 0) {
+            if(v4l2_ioctl(fd, VIDIOC_S_CTRL, &c) != 0) {
                 fprintf(stderr, "Failed to set control \"%s\": %s\n",
                         ctrl.name, strerror(errno));
                 continue;
@@ -199,7 +200,7 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
     }
     
-    fd = open(device, O_RDWR, 0);
+    fd = v4l2_open(device, O_RDWR, 0);
     if(fd < 0) {
         fprintf(stderr, "Unable to open %s: %s\n", device, strerror(errno));
         return EXIT_FAILURE;
@@ -214,7 +215,7 @@ int main(int argc, char **argv)
     file = fopen(filename, mode);
     if(!file) {
         fprintf(stderr, "Unable to open %s: %s\n", filename, strerror(errno));
-        close(fd);
+        v4l2_close(fd);
         return EXIT_FAILURE;
     }
     
@@ -225,7 +226,7 @@ int main(int argc, char **argv)
     }
     
     fclose(file);
-    close(fd);
+    v4l2_close(fd);
     
     return ret;
 }
