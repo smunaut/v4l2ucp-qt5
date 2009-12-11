@@ -1,5 +1,3 @@
-#!/bin/sh
-cat <<EOF
 [Desktop Entry]
 Type=Application
 Name=Video4Linux Control Panel
@@ -7,4 +5,3 @@ Comment=A universal control panel for V4L2 devices
 Exec=v4l2ucp
 Categories=AudioVideo;X-AudioVideoTools;
 Icon=v4l2ucp
-EOF
