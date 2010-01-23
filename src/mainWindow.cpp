@@ -1,6 +1,6 @@
 /*  v4l2ucp - A universal control panel for all V4L2 devices
     Copyright (C) 2005,2009 Scott J. Bertin (scottbertin@yahoo.com)
-    Copyright (C) 2009 Vasily Khoruzhick (anarsoul@gmail.com)
+    Copyright (C) 2009-2010 Vasily Khoruzhick (anarsoul@gmail.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -303,7 +303,7 @@ void MainWindow::about()
         "controls come directly from the driver. If they cause problems\n"
         "with your hardware, please contact the maintainer of the driver.\n\n"
         "Copyright (C) 2005 Scott J. Bertin\n"
-        "Copyright (C) 2009 Vasily Khoruzhick\n\n"
+        "Copyright (C) 2009-2010 Vasily Khoruzhick\n\n"
         "This program is free software; you can redistribute it and/or modify\n"
         "it under the terms of the GNU General Public License as published by\n"
         "the Free Software Foundation; either version 2 of the License, or\n"
