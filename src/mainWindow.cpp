@@ -274,7 +274,7 @@ void MainWindow::add_control(struct v4l2_queryctrl &ctrl, int fd, QWidget *paren
     }
     
     layout->addWidget(w);
-    if(ctrl.flags & V4L2_CTRL_FLAG_GRABBED) {
+    if(ctrl.flags & (V4L2_CTRL_FLAG_GRABBED|V4L2_CTRL_FLAG_READ_ONLY|V4L2_CTRL_FLAG_INACTIVE)) {
         w->setEnabled(false);
     }
 

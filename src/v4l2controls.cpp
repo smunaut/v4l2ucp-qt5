@@ -54,6 +54,25 @@ void V4L2Control::updateHardware()
 
 void V4L2Control::updateStatus()
 {
+    struct v4l2_queryctrl ctrl = { 0 };
+    ctrl.id = cid;
+    if(v4l2_ioctl(fd, VIDIOC_QUERYCTRL, &ctrl) == -1) {
+        QString msg;
+	msg.sprintf("Unable to get the status of %s\n%s", name,
+	            strerror(errno));
+	QMessageBox::warning(this, "Unable to get control status", msg, "OK");
+    } else {
+        setEnabled(!(ctrl.flags & (V4L2_CTRL_FLAG_GRABBED|V4L2_CTRL_FLAG_READ_ONLY|V4L2_CTRL_FLAG_INACTIVE)));
+    }
+
+#ifdef V4L2_CTRL_FLAG_WRITE_ONLY
+    if(ctrl.flags & V4L2_CTRL_FLAG_WRITE_ONLY)
+        return;
+#endif
+
+    if(ctrl.type == V4L2_CTRL_TYPE_BUTTON)
+        return;
+
     struct v4l2_control c;
     c.id = cid;
     if(v4l2_ioctl(fd, VIDIOC_G_CTRL, &c) == -1) {
@@ -64,16 +83,6 @@ void V4L2Control::updateStatus()
     } else {
         if(c.value != getValue())
 	    setValue(c.value);
-    }
-    struct v4l2_queryctrl ctrl;
-    ctrl.id = cid;
-    if(v4l2_ioctl(fd, VIDIOC_QUERYCTRL, &ctrl) == -1) {
-        QString msg;
-	msg.sprintf("Unable to get the status of %s\n%s", name,
-	            strerror(errno));
-	QMessageBox::warning(this, "Unable to get control status", msg, "OK");
-    } else {
-        setEnabled(ctrl.flags == 0);
     }
 }
 
@@ -245,20 +254,6 @@ V4L2ButtonControl::V4L2ButtonControl
     QPushButton *pb = new QPushButton((const char *)ctrl.name, this);
     this->layout.addWidget(pb);
     QObject::connect( pb, SIGNAL(clicked()), this, SLOT(updateHardware()) );
-}
-
-void V4L2ButtonControl::updateStatus()
-{
-    struct v4l2_queryctrl ctrl;
-    ctrl.id = cid;
-    if(v4l2_ioctl(fd, VIDIOC_QUERYCTRL, &ctrl) == -1) {
-        QString msg;
-	msg.sprintf("Unable to get the status of %s\n%s", name,
-	            strerror(errno));
-	QMessageBox::warning(this, "Unable to get control status", msg, "OK");
-    } else {
-        setEnabled(ctrl.flags == 0);
-    }
 }
 
 void V4L2ButtonControl::resetToDefault()

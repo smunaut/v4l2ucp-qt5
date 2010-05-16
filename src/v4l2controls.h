@@ -111,7 +111,6 @@ class V4L2ButtonControl : public V4L2Control
 {
     Q_OBJECT
 public slots:
-    void updateStatus();
     void resetToDefault();
 
 public:
