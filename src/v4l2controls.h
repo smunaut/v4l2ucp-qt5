@@ -21,6 +21,11 @@
 #include <linux/types.h>          /* for videodev2.h */
 #include <linux/videodev2.h>
 
+#ifndef V4L2_CID_IRIS_ABSOLUTE
+#define V4L2_CID_IRIS_ABSOLUTE			(V4L2_CID_CAMERA_CLASS_BASE+17)
+#define V4L2_CID_IRIS_RELATIVE			(V4L2_CID_CAMERA_CLASS_BASE+18)
+#endif
+
 #include <QHBoxLayout>
 #include <QCheckBox>
 #include <QSlider>
@@ -46,6 +51,19 @@ protected:
     int default_value;
     char name[32];
     QHBoxLayout layout;
+
+private:
+    /* Not pretty we use these to keep track of the value of some special
+       ctrls which impact the writability of other ctrls for queryCleanup(). */
+    static int exposure_auto;
+    static int focus_auto;
+    static int hue_auto;
+    static int whitebalance_auto;
+    void cacheValue(const struct v4l2_control &c);
+    /* This function sets various flags for well known (UVC) controls, these
+       flags should really be set by the driver, but for older driver versions
+       this does not happen. */
+    void queryCleanup(struct v4l2_queryctrl *ctrl);
 };
 
 class V4L2IntegerControl : public V4L2Control
