@@ -249,16 +249,16 @@ void MainWindow::add_control(struct v4l2_queryctrl &ctrl, int fd, QWidget *paren
     
     switch(ctrl.type) {
         case V4L2_CTRL_TYPE_INTEGER:
-            w = new V4L2IntegerControl(fd, ctrl, parent);
+            w = new V4L2IntegerControl(fd, ctrl, parent, this);
             break;
         case V4L2_CTRL_TYPE_BOOLEAN:
-            w = new V4L2BooleanControl(fd, ctrl, parent);
+            w = new V4L2BooleanControl(fd, ctrl, parent, this);
             break;
         case V4L2_CTRL_TYPE_MENU:
-            w = new V4L2MenuControl(fd, ctrl, parent);
+            w = new V4L2MenuControl(fd, ctrl, parent, this);
             break;
         case V4L2_CTRL_TYPE_BUTTON:
-            w = new V4L2ButtonControl(fd, ctrl, parent);
+            w = new V4L2ButtonControl(fd, ctrl, parent, this);
             break;
         case V4L2_CTRL_TYPE_INTEGER64:
         case V4L2_CTRL_TYPE_CTRL_CLASS:

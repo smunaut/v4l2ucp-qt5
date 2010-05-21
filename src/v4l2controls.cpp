@@ -27,6 +27,7 @@
 #include <QValidator>
 #include <QMessageBox>
 
+#include "mainWindow.h"
 #include "v4l2controls.h"
 
 int V4L2Control::exposure_auto = V4L2_EXPOSURE_MANUAL;
@@ -35,8 +36,8 @@ int V4L2Control::hue_auto = 0;
 int V4L2Control::whitebalance_auto = 0;
 
 V4L2Control::V4L2Control(int fd, const struct v4l2_queryctrl &ctrl,
-                         QWidget *parent) :
-    QWidget(parent), cid(ctrl.id), default_value(ctrl.default_value)
+                         QWidget *parent, MainWindow *mw) :
+    QWidget(parent), cid(ctrl.id), default_value(ctrl.default_value), mw(mw)
 {
     this->fd = fd;
     strncpy(name, (const char *)ctrl.name, sizeof(name));
@@ -130,11 +131,12 @@ void V4L2Control::updateHardware()
         QString msg;
 	msg.sprintf("Unable to set %s\n%s", name, strerror(errno));
 	QMessageBox::warning(this, "Unable to set control", msg, "OK");
-    }
-    updateStatus();
+	updateStatus(false);
+    } else
+        updateStatus(true);
 }
 
-void V4L2Control::updateStatus()
+void V4L2Control::updateStatus(bool hwChanged)
 {
     struct v4l2_queryctrl ctrl = { 0 };
     ctrl.id = cid;
@@ -147,6 +149,9 @@ void V4L2Control::updateStatus()
         queryCleanup(&ctrl);
         setEnabled(!(ctrl.flags & (V4L2_CTRL_FLAG_GRABBED|V4L2_CTRL_FLAG_READ_ONLY|V4L2_CTRL_FLAG_INACTIVE)));
     }
+
+    if (hwChanged && (ctrl.flags & V4L2_CTRL_FLAG_UPDATE))
+        mw->timerShot();
 
 #ifdef V4L2_CTRL_FLAG_WRITE_ONLY
     if(ctrl.flags & V4L2_CTRL_FLAG_WRITE_ONLY)
@@ -182,8 +187,8 @@ void V4L2Control::resetToDefault()
  * V4L2IntegerControl
  */
 V4L2IntegerControl::V4L2IntegerControl
-    (int fd, const struct v4l2_queryctrl &ctrl, QWidget *parent) :
-    V4L2Control(fd, ctrl, parent),
+    (int fd, const struct v4l2_queryctrl &ctrl, QWidget *parent, MainWindow *mw) :
+    V4L2Control(fd, ctrl, parent, mw),
     minimum(ctrl.minimum), maximum(ctrl.maximum), step(ctrl.step)
 {
     int pageStep = (maximum-minimum)/10;
@@ -263,8 +268,8 @@ void V4L2IntegerControl::SetValueFromText()
  * V4L2BooleanControl
  */
 V4L2BooleanControl::V4L2BooleanControl
-    (int fd, const struct v4l2_queryctrl &ctrl, QWidget *parent) :
-    V4L2Control(fd, ctrl, parent),
+    (int fd, const struct v4l2_queryctrl &ctrl, QWidget *parent, MainWindow *mw) :
+    V4L2Control(fd, ctrl, parent, mw),
     cb(new QCheckBox(this))
 {
     this->layout.addWidget(cb);
@@ -286,8 +291,8 @@ int V4L2BooleanControl::getValue()
  * V4L2MenuControl
  */
 V4L2MenuControl::V4L2MenuControl
-    (int fd, const struct v4l2_queryctrl &ctrl, QWidget *parent) :
-    V4L2Control(fd, ctrl, parent)
+    (int fd, const struct v4l2_queryctrl &ctrl, QWidget *parent, MainWindow *mw) :
+    V4L2Control(fd, ctrl, parent, mw)
 {
     cb = new QComboBox(this);
     this->layout.addWidget(cb);
@@ -332,8 +337,8 @@ void V4L2MenuControl::menuActivated(int val)
  * V4L2ButtonControl
  */
 V4L2ButtonControl::V4L2ButtonControl
-    (int fd, const struct v4l2_queryctrl &ctrl, QWidget *parent) :
-    V4L2Control(fd, ctrl, parent)
+    (int fd, const struct v4l2_queryctrl &ctrl, QWidget *parent, MainWindow *mw) :
+    V4L2Control(fd, ctrl, parent, mw)
 {
     QPushButton *pb = new QPushButton((const char *)ctrl.name, this);
     this->layout.addWidget(pb);
