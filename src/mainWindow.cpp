@@ -267,9 +267,9 @@ void MainWindow::add_control(struct v4l2_queryctrl &ctrl, int fd, QWidget *paren
     }
     
     if(!w) {
-        new QLabel("Unknown control", parent);
-        new QLabel(parent);
-        new QLabel(parent);
+        layout->addWidget(new QLabel(parent));
+        layout->addWidget(new QLabel(parent));
+        layout->addWidget(new QLabel(parent));
         return;
     }
     
