@@ -267,7 +267,11 @@ void MainWindow::add_control(struct v4l2_queryctrl &ctrl, int fd, QWidget *paren
     }
     
     if(!w) {
-        layout->addWidget(new QLabel(parent));
+        if (ctrl.type == V4L2_CTRL_TYPE_CTRL_CLASS)
+            layout->addWidget(new QLabel(parent));
+        else
+            layout->addWidget(new QLabel("Unknown control", parent));
+
         layout->addWidget(new QLabel(parent));
         layout->addWidget(new QLabel(parent));
         return;
